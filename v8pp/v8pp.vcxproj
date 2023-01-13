@@ -33,6 +33,7 @@
     <ClCompile Include="context.cpp" />
     <ClCompile Include="convert.cpp" />
     <ClCompile Include="json.cpp" />
+    <ClCompile Include="nativeModule.cpp" />
     <ClCompile Include="throw_ex.cpp" />
     <ClCompile Include="version.cpp" />
   </ItemGroup>
@@ -46,6 +47,7 @@
     <ClInclude Include="function.hpp" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="module.hpp" />
+    <ClInclude Include="nativeModule.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="property.hpp" />
     <ClInclude Include="ptr_traits.hpp" />

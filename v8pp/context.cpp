@@ -68,6 +68,12 @@ void context::load_module(v8::FunctionCallbackInfo<v8::Value> const& args)
 			UINT const prev_error_mode = SetErrorMode(SEM_NOOPENFILEERRORBOX);
 			module.handle = LoadLibraryA(filename.c_str());
 			::SetErrorMode(prev_error_mode);
+
+
+
+
+
+
 #else
 			module.handle = dlopen(filename.c_str(), RTLD_LAZY);
 #endif
@@ -77,9 +83,24 @@ void context::load_module(v8::FunctionCallbackInfo<v8::Value> const& args)
 				throw std::runtime_error("load_module(" + name
 					+ "): could not load shared library " + filename);
 			}
+
+
+
+
+
 #if defined(WIN32)
 			void* sym = ::GetProcAddress((HMODULE)module.handle,
 				V8PP_STRINGIZE(V8PP_PLUGIN_INIT_PROC_NAME));
+
+
+
+
+
+
+
+
+
+
 #else
 			void* sym = dlsym(module.handle, V8PP_STRINGIZE(V8PP_PLUGIN_INIT_PROC_NAME));
 #endif
@@ -104,6 +125,8 @@ void context::load_module(v8::FunctionCallbackInfo<v8::Value> const& args)
 	}
 	args.GetReturnValue().Set(scope.Escape(result));
 }
+
+
 
 void context::run_file(v8::FunctionCallbackInfo<v8::Value> const& args)
 {
@@ -157,15 +180,23 @@ v8::Isolate* context::create_isolate(v8::ArrayBuffer::Allocator* allocator)
 
 context::context(v8::Isolate* isolate, v8::ArrayBuffer::Allocator* allocator,
 		bool add_default_global_methods, bool enter_context,
-		v8::Local<v8::ObjectTemplate> global)
+		v8::Local<v8::ObjectTemplate> global,
+		std::vector<std::shared_ptr<hv::v2::nativeModule>>* nativeModules)
 	: own_isolate_(isolate == nullptr)
 	, enter_context_(enter_context)
 	, isolate_(isolate ? isolate : create_isolate(allocator))
+	, nativeModules_(nullptr)
 {
 	if (own_isolate_)
 	{
 		isolate_->Enter();
 	}
+
+	if (nativeModules)
+	{
+		nativeModules_ = nativeModules;
+	}
+
 
 	v8::HandleScope scope(isolate_);
 
@@ -198,6 +229,7 @@ context::context(context&& src) noexcept
 	, impl_(std::move(src.impl_))
 	, modules_(std::move(src.modules_))
 	, lib_path_(std::move(src.lib_path_))
+	, nativeModules_(src.nativeModules_)
 {
 }
 
@@ -213,6 +245,7 @@ context& context::operator=(context&& src) noexcept
 		impl_ = std::move(src.impl_);
 		modules_ = std::move(src.modules_);
 		lib_path_ = std::move(src.lib_path_);
+		nativeModules_ = std::move(src.nativeModules_);
 	}
 	return *this;
 }
@@ -260,6 +293,11 @@ void context::destroy()
 		isolate_->Dispose();
 	}
 	isolate_ = nullptr;
+
+	if (nativeModules_)
+	{
+		nativeModules_ = nullptr;
+	}
 }
 
 context& context::value(std::string_view name, v8::Local<v8::Value> value)

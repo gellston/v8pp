@@ -7,6 +7,7 @@
     <ClCompile Include="throw_ex.cpp" />
     <ClCompile Include="convert.cpp" />
     <ClCompile Include="version.cpp" />
+    <ClCompile Include="nativeModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="context.hpp" />
@@ -24,6 +25,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="ptr_traits.hpp" />
     <ClInclude Include="version.hpp" />
+    <ClInclude Include="nativeModule.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

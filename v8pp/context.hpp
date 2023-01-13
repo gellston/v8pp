@@ -8,6 +8,7 @@
 
 #include "v8pp/convert.hpp"
 #include "v8pp/function.hpp"
+#include "v8pp/nativeModule.hpp"
 
 namespace v8pp {
 
@@ -39,10 +40,11 @@ public:
 		v8::ArrayBuffer::Allocator* allocator = nullptr,
 		bool add_default_global_methods = true,
 		bool enter_context = true,
-		v8::Local<v8::ObjectTemplate> global = {});
+		v8::Local<v8::ObjectTemplate> global = {},
+		std::vector<std::shared_ptr<hv::v2::nativeModule>> * nativeModules = nullptr);
 
 	explicit context(options const& opts)
-		: context(opts.isolate, opts.allocator, opts.add_default_global_methods, opts.enter_context, opts.global)
+		: context(opts.isolate, opts.allocator, opts.add_default_global_methods, opts.enter_context, opts.global, nullptr)
 	{
 	}
 
@@ -53,6 +55,7 @@ public:
 	context& operator=(context&&) noexcept;
 
 	~context();
+
 
 	/// V8 isolate associated with this context
 	v8::Isolate* isolate() const { return isolate_; }
@@ -115,6 +118,8 @@ private:
 	struct dynamic_module;
 	std::map<std::string, dynamic_module> modules_;
 	std::string lib_path_;
+	std::vector<std::shared_ptr<hv::v2::nativeModule>> * nativeModules_;
+
 };
 
 } // namespace v8pp
